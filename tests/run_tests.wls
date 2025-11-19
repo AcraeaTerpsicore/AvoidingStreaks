@@ -65,6 +65,33 @@ tests = Flatten@{
         TestID -> "minimal-radius"
     ],
 
+    VerificationTest[
+        BlockRandom[
+            SeedRandom[2024];
+            MonteCarloStreakWaitingTime[3, 3, "Trials" -> 5, "ReturnSamples" -> True]["Samples"]
+        ],
+        {25, 26, 27, 3, 26},
+        TestID -> "mc-strict-samples"
+    ],
+
+    VerificationTest[
+        BlockRandom[
+            SeedRandom[2024];
+            MonteCarloStreakWaitingTime[3, 3, "Trials" -> 5]
+        ]["Samples"],
+        None,
+        TestID -> "mc-strict-nosamples"
+    ],
+
+    VerificationTest[
+        BlockRandom[
+            SeedRandom[3031];
+            MonteCarloSoftStreakWaitingTime[3, 3, "Trials" -> 5, "ReturnSamples" -> True]["Samples"]
+        ],
+        {3, 3, 6, 4, 5},
+        TestID -> "mc-soft-samples"
+    ],
+
     Table[
         With[{n = 3, k = 3},
             VerificationTest[

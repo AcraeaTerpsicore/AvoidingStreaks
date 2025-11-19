@@ -43,8 +43,11 @@ All tests should pass with exit code `0`.  See `TEST_SUMMARY.md` for the scenari
 - `MinimalForbiddenDenominator[n,k,z]` exposes the denominator directly, making it easy to study where it stays positive.
 - `MinimalForbiddenRadiusLowerBound[n,k]` evaluates the denominator at $z=\frac{1}{n}$; the positive result certifies the strict $> \frac{1}{n}$ lower bound for the radius of convergence from Section 8.
 
+## Monte Carlo verification
+- `MonteCarloStreakWaitingTime[n,k,"Trials"->T,"ReturnSamples"->True]` performs $T$ simulated experiments of the strict streak process, returning an association with the sample mean, deviation, comparison against $E(n,k)$ and (optionally) the raw sample list.
+- `MonteCarloSoftStreakWaitingTime` provides the analogous sampler for non-decreasing streaks using the conjectured soft expectation $E_{\textsf{soft}}(n,k)$.
+- Both utilities expose `"Error"` and `"RelativeError"` fields so you can assess how close the empirical mean is to the closed-form value.
+
 ## Future Extensions
 - [ ] **General Goulden–Jackson engine**  
   Status: Not started — Extend `Streaks.wl` with a full implementation of the cluster/overlap linear system from Sections 3–4 so arbitrary forbidden sets $\Fs$ (not only streaks) can be enumerated by solving for all $W(\vb{a})$ and the resulting generating function.
-- [ ] **Random-sampling verification tools**  
-  Status: Not started — Build Monte Carlo samplers inspired by Section 6 to empirically estimate the waiting time for (soft) streaks and compare the averages with `ExpectedDrawsToStreak` / `SoftStreakExpectedDraws`.

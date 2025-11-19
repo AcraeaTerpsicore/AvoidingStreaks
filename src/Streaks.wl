@@ -50,6 +50,12 @@ MinimalForbiddenDenominator::usage =
 MinimalForbiddenRadiusLowerBound::usage =
     "MinimalForbiddenRadiusLowerBound[n, k] evaluates the denominator at z = 1/n, proving the >1/n radius lower bound.";
 
+MonteCarloStreakWaitingTime::usage =
+    "MonteCarloStreakWaitingTime[n, k, opts] empirically estimates the waiting time for a strict streak with uniform sampling; returns an association with the sample mean, deviation, and comparison to ExpectedDrawsToStreak.";
+
+MonteCarloSoftStreakWaitingTime::usage =
+    "MonteCarloSoftStreakWaitingTime[n, k, opts] empirically estimates the waiting time for a non-decreasing (soft) streak and compares it against SoftStreakExpectedDraws.";
+
 CountWordsWithoutStreak::usage =
     "CountWordsWithoutStreak[n, k, s] brute-forces the number of n-ary words of length s that avoid a strictly increasing streak of length k (useful for verification).";
 
@@ -181,6 +187,53 @@ MinimalForbiddenRadiusLowerBound[n_Integer?Positive, k_Integer?Positive] /; k >=
             "CandidateBound" -> z,
             "DenominatorAtBound" -> MinimalForbiddenDenominator[n, k, z]
         |>
+    ];
+
+ClearAll[simulateStreakTrial];
+simulateStreakTrial[n_Integer?Positive, k_Integer?Positive, pred_] /; k >= 2 :=
+    Module[{prev, streak = 1, draws = 1, next},
+        prev = RandomInteger[{1, n}];
+        While[streak < k,
+            next = RandomInteger[{1, n}];
+            draws++;
+            If[pred[prev, next], streak++, streak = 1];
+            prev = next;
+        ];
+        draws
+    ];
+
+ClearAll[monteCarloReport];
+monteCarloReport[n_, k_, trials_Integer?Positive, pred_, analyticVal_, returnSamples_] :=
+    Module[{samples, analytic = N[analyticVal, 20], assoc},
+        samples = Table[simulateStreakTrial[n, k, pred], {trials}];
+        assoc = <|
+            "Mean" -> N[Mean[samples], 20],
+            "StandardDeviation" -> N[StandardDeviation[samples], 20],
+            "SampleCount" -> trials,
+            "AnalyticExpectation" -> analytic,
+            "Error" -> N[Mean[samples] - analytic, 20],
+            "RelativeError" -> N[(Mean[samples] - analytic)/analytic, 20],
+            "Samples" -> None
+        |>;
+        If[TrueQ[returnSamples],
+            assoc["Samples"] = samples,
+            assoc["Samples"] = None
+        ];
+        assoc
+    ];
+
+Options[MonteCarloStreakWaitingTime] = {"Trials" -> 1000, "ReturnSamples" -> False};
+ClearAll[MonteCarloStreakWaitingTime];
+MonteCarloStreakWaitingTime[n_Integer?Positive, k_Integer?Positive, opts : OptionsPattern[Options[MonteCarloStreakWaitingTime]]] /; k >= 2 :=
+    Module[{trials = OptionValue["Trials"], ret = OptionValue["ReturnSamples"]},
+        monteCarloReport[n, k, trials, (#2 > #1) &, ExpectedDrawsToStreak[n, k], ret]
+    ];
+
+Options[MonteCarloSoftStreakWaitingTime] = {"Trials" -> 1000, "ReturnSamples" -> False};
+ClearAll[MonteCarloSoftStreakWaitingTime];
+MonteCarloSoftStreakWaitingTime[n_Integer?Positive, k_Integer?Positive, opts : OptionsPattern[Options[MonteCarloSoftStreakWaitingTime]]] /; k >= 2 :=
+    Module[{trials = OptionValue["Trials"], ret = OptionValue["ReturnSamples"]},
+        monteCarloReport[n, k, trials, (#2 >= #1) &, SoftStreakExpectedDraws[n, k], ret]
     ];
 
 End[];
