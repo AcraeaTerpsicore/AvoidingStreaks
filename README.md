@@ -1,6 +1,6 @@
 # Streak Avoidance Toolkit (Mathematica/Wolfram Language)
 
-This project implements the key constructions from `reference_paper/main.tex` directly in Wolfram Language. It focuses on enumerating $n$-ary words that avoid either strictly increasing streaks of length $k$ or their non-decreasing (``soft'') counterparts, together with the expected waiting times and asymptotic formulas from the [paper](https://arxiv.org/abs/2511.13287).
+This project implements the key constructions directly in Wolfram Language. It focuses on enumerating $n$-ary words that avoid either strictly increasing streaks of length $k$ or their non-decreasing (``soft'') counterparts, together with the expected waiting times and asymptotic formulas from the [paper](https://arxiv.org/abs/2511.13287) "Counting words without strictly increasing subwords of fixed length".
 
 ## Layout
 - `src/Streaks.wl` – main package containing implementations of $\psi_{k,r}$, the Goulden–Jackson weights, generating functions, waiting-time formulas, and helpers for brute-force verification.
