@@ -44,6 +44,27 @@ tests = Flatten@{
         TestID -> "generalized-binomial"
     ],
 
+    VerificationTest[
+        Simplify[
+            MinimalForbiddenGeneratingFunction[5, 3][z] -
+            Sum[z^i, {i, 0, 2}]/(1 - (5 - 1)*Sum[z^i, {i, 1, 3}])
+        ],
+        0,
+        TestID -> "minimal-gf"
+    ],
+
+    VerificationTest[
+        MinimalForbiddenDenominator[6, 4, 1/6],
+        (1/6)^4,
+        TestID -> "minimal-denominator-bound"
+    ],
+
+    VerificationTest[
+        MinimalForbiddenRadiusLowerBound[6, 4],
+        <|"CandidateBound" -> 1/6, "DenominatorAtBound" -> (1/6)^4|>,
+        TestID -> "minimal-radius"
+    ],
+
     Table[
         With[{n = 3, k = 3},
             VerificationTest[

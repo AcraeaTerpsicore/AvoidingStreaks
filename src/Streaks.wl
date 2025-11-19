@@ -41,6 +41,15 @@ SoftStreakExpectedDraws::usage =
 ContinuousStreakExpectation::usage =
     "ContinuousStreakExpectation[k] gives the limiting expected waiting time for a streak of length k when the alphabet size tends to infinity, matching the continuous-draw model.";
 
+MinimalForbiddenGeneratingFunction::usage =
+    "MinimalForbiddenGeneratingFunction[n, k] returns the generating function f_{M(k)}(z) for the minimal forbidden set { (1,1,...,1) } of size k.";
+
+MinimalForbiddenDenominator::usage =
+    "MinimalForbiddenDenominator[n, k, z] returns 1 - (n-1)(z + z^2 + ... + z^k), the denominator that controls the radius-of-convergence lower bound.";
+
+MinimalForbiddenRadiusLowerBound::usage =
+    "MinimalForbiddenRadiusLowerBound[n, k] evaluates the denominator at z = 1/n, proving the >1/n radius lower bound.";
+
 CountWordsWithoutStreak::usage =
     "CountWordsWithoutStreak[n, k, s] brute-forces the number of n-ary words of length s that avoid a strictly increasing streak of length k (useful for verification).";
 
@@ -150,6 +159,29 @@ SoftStreakExpectedDraws[n_Integer?Positive, k_Integer?Positive] /; k >= 2 :=
 ClearAll[ContinuousStreakExpectation];
 ContinuousStreakExpectation[k_Integer?Positive] /; k >= 2 :=
     k/Sum[Exp[omega[k]^s]*(1 - omega[k]^(-s)), {s, 1, k - 1}];
+
+ClearAll[MinimalForbiddenGeneratingFunction];
+MinimalForbiddenGeneratingFunction[n_Integer?Positive, k_Integer?Positive] /; k >= 2 :=
+    With[{n0 = n, k0 = k},
+        Function[{z},
+            Module[{num = Sum[z^i, {i, 0, k0 - 1}], den = MinimalForbiddenDenominator[n0, k0, z]},
+                num/den
+            ]
+        ]
+    ];
+
+ClearAll[MinimalForbiddenDenominator];
+MinimalForbiddenDenominator[n_Integer?Positive, k_Integer?Positive, z_] /; k >= 2 :=
+    1 - (n - 1)*Sum[z^i, {i, 1, k}];
+
+ClearAll[MinimalForbiddenRadiusLowerBound];
+MinimalForbiddenRadiusLowerBound[n_Integer?Positive, k_Integer?Positive] /; k >= 2 :=
+    Module[{z = 1/n},
+        <|
+            "CandidateBound" -> z,
+            "DenominatorAtBound" -> MinimalForbiddenDenominator[n, k, z]
+        |>
+    ];
 
 End[];
 
